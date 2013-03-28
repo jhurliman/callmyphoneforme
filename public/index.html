@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset=utf-8 />
+<title>Call My Phone For Me</title>
+<meta name="viewport" content="maximum-scale=1.0,width=device-width,initial-scale=1.0,user-scalable=0">
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="format-detection" content="telephone=no">
+<style type="text/css">
+/* === Basic reset === */
+* {
+  margin: 0;
+  padding: 0;
+  outline: none;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  list-style: none;
+}
+a>img { border: none; text-decoration:none; }
+header, footer, article, section, nav, aside { display: block; }
+
+/* === General === */
+body {
+  font-family:Arial;
+  font-size: 14px;
+}
+
+.clearfix {
+  clear:both;
+}
+
+.errors {
+  display: none;
+  text-align: center;
+  width: 300px;
+  position: absolute;
+  left: 50%;
+  z-index: 2;
+  background-color: red;
+  margin-left: -150px;
+  padding: 5px;
+  top: 0;
+  font-weight: bold;
+}
+
+/* === Phone Number Dialog === */
+.dialog {
+    display:block;
+    position:relative;
+    width:93.75%;   /* This is 300px on 320px wide screen */
+    max-width:500px;    /* Just to make sure that it doesnt get crazy on bg screens */
+    min-width:300px;    /* And make sure that it contains at least some size */
+    height: 310px;
+    margin:30px auto;
+    padding:20px;
+    overflow:hidden;
+    border-radius:6px;
+    z-index:1;
+
+    color: #fff;
+    box-shadow: 0px 0px 4px rgba(0,0,0,0.8), inset 0px 1px 3px rgba(255,255,255,0.3), inset 0px 0px 2px rgba(255,255,255,0.2);
+}
+
+.dialog h2 {
+    text-shadow:1px 1px 2px rgba(17,121,173,0.8);
+    margin-bottom: 48px;
+}
+
+.dialog h3 {
+  text-align: center;
+  margin-top: 70px;
+  font-size: 32px;
+}
+
+#confirm-dialog h3 {
+  margin-top: 60px;
+}
+
+.dialog h4 {
+  text-align: center;
+}
+
+.dialog label {
+    color:rgba(136,136,136,0.9);
+    text-shadow:0px 1px 2px rgba(255,255,255,0.6);
+}
+
+.dialog input {
+    border: 1px solid rgba(136,136,136,0.9);
+}
+  
+/* === Credit Card === */
+li { display: block; }
+
+.credit-card {
+    display:block;
+    position:relative;
+    width:93.75%;   /* This is 300px on 320px wide screen */
+    max-width:500px;    /* Just to make sure that it doesnt get crazy on bg screens */
+    min-width:300px;    /* And make sure that it contains at least some size */
+    height: 310px;
+    margin:30px auto;
+    padding:20px;
+    overflow:hidden;
+    border-radius:6px;
+    z-index:1;
+
+    color: #fff;
+    box-shadow: 0px 0px 4px rgba(0,0,0,0.8), inset 0px 1px 3px rgba(255,255,255,0.3), inset 0px 0px 2px rgba(255,255,255,0.2);
+}
+
+.credit-card h2 {
+    text-shadow:1px 1px 2px rgba(17,121,173,0.8);
+}
+
+.credit-card .logo {
+    color:rgba(255,255,255,0.9);
+    font-size:2em;
+    font-style:italic;
+    text-shadow:0px 0px 3px rgba(17,123,173,0.9);
+}
+
+.credit-card .logo:after {
+    content:' ';
+    position:absolute;
+    left:0px;
+    top:5px;
+    width: 0;
+    height: 0;
+    border-top: 10px solid orange;
+    border-left: 10px solid transparent;
+}
+
+.credit-card .watermark {
+    bottom:-100px;
+    left:-50px;
+    color:rgba(255,255,255,0.06);
+    font-size:20em;
+    font-weight:bold;
+    font-style:italic;
+}
+
+.credit-card .inputs li.expire {
+    float:left;
+    width:70%;
+    margin-right:5%;
+}
+
+.credit-card .inputs li.expire input{
+    float:left;
+    width:40%;
+}
+
+.credit-card .inputs li.expire input.month{
+    width:35%;
+    margin-right:5%;
+}
+
+.credit-card .inputs li.cvc-code {
+    float:left;
+    width:25%;
+    margin-bottom: 20px;
+}
+
+.credit-card .inputs li.cvc-code input {
+    width:100%;
+}
+
+.credit-card .watermark {
+    position:absolute;
+    z-index:10;
+}
+
+.credit-card .logo {
+    position:absolute;
+    top:15px;
+    right:20px;
+    text-transform:uppercase;
+    font-weight:bold;
+}
+
+/* === Forms === */
+label {
+    display:block;
+    margin-bottom:8px;
+    color:rgba(255,255,255,0.6);
+    text-transform:uppercase;
+    font-size:1.1em;
+    font-weight:bold;
+    text-shadow:0px 1px 2px rgba(17,123,173,0.6);
+}
+
+input {
+    display:block;
+    padding:12px 10px;
+    color:#999;
+    font-size:1.2em;
+    font-weight:bold;
+    text-shadow:1px  1px 1px #fff;
+    border:1px solid rgba(16,103,133,0.6);
+    box-shadow:0px 0px 3px rgba(255,255,255,0.5), inset 0px 1px 4px rgba(0,0,0,0.2);
+    border-radius:3px;
+}
+
+.inputs {
+    list-style:none;
+    margin-top:20px;
+}
+
+.inputs li {
+    margin-bottom:20px;
+}
+
+.inputs li.last {
+    margin-bottom:10px;
+}
+
+input.full {
+    width:100%;
+}
+
+button {
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
+    width: 200px;
+    max-width: 45%;
+    padding: 10px 5px;
+    font-size: 20px;
+    font-weight: 300;
+    border-radius: 6px;
+    vertical-align: middle;
+    cursor: pointer;
+    color: white;
+    text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.4);
+
+    background-color: #0088cc; /* Old browsers */
+    background-image: -moz-linear-gradient(top, #0088cc 0%, #0055cc 100%); /* FF3.6+ */
+    background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#0088cc), color-stop(100%,#0055cc)); /* Chrome,Safari4+ */
+    background-image: -webkit-linear-gradient(top, #0088cc 0%,#0055cc 100%); /* Chrome10+,Safari5.1+ */
+    background-image: -o-linear-gradient(top, #0088cc 0%,#0055cc 100%); /* Opera 11.10+ */
+    background-image: -ms-linear-gradient(top, #0088cc 0%,#0055cc 100%); /* IE10+ */
+    background-image: linear-gradient(to bottom, #0088cc 0%,#0055cc 100%); /* W3C */
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#0088cc', endColorstr='#0055cc',GradientType=0 ); /* IE6-9 */
+
+    border: 1px solid;
+    border-color: #05C #05C #003580;
+    border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25);
+
+    -moz-box-shadow: 0 1px 4px rgba(32, 32, 32, 0.8), 0 10px 25px -5px rgba(255, 255, 255, 0.5) inset;
+    -webkit-box-shadow: 0 1px 4px rgba(32, 32, 32, 0.8), 0 10px 25px -5px rgba(255, 255, 255, 0.5) inset;
+    box-shadow: 0 1px 4px rgba(32, 32, 32, 0.8), 0 10px 25px -5px rgba(255, 255, 255, 0.5) inset;
+    -ms-filter: "progid:DXImageTransform.Microsoft.Shadow(Strength=4, Direction=135, Color='#000000')";
+    filter: progid:DXImageTransform.Microsoft.Shadow(Strength=4, Direction=135, Color='#000000');
+}
+
+button.back-button {
+    right: 54%;
+    width: 120px;
+
+    background-color: #cccccc; /* Old browsers */
+    background-image: -moz-linear-gradient(top,  #cccccc 0%, #999999 100%); /* FF3.6+ */
+    background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#cccccc), color-stop(100%,#999999)); /* Chrome,Safari4+ */
+    background-image: -webkit-linear-gradient(top,  #cccccc 0%,#999999 100%); /* Chrome10+,Safari5.1+ */
+    background-image: -o-linear-gradient(top,  #cccccc 0%,#999999 100%); /* Opera 11.10+ */
+    background-image: -ms-linear-gradient(top,  #cccccc 0%,#999999 100%); /* IE10+ */
+    background-image: linear-gradient(to bottom,  #cccccc 0%,#999999 100%); /* W3C */
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#cccccc', endColorstr='#999999',GradientType=0 ); /* IE6-9 */
+
+    border-color: #05C #05C #003580;
+    border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25);
+}
+
+button:hover, button:active {
+    background-image: none;
+}
+  
+button:active {
+    -webkit-box-shadow: inset 0 1px 2px rgba(0,0,0,0.3);
+    -moz-box-shadow: inset 0 1px 2px rgba(0,0,0,0.3);
+    box-shadow: inset 0 1px 2px rgba(0,0,0,0.3);
+}
+
+button:disabled, button:disabled:hover, button:disabled:active {
+  cursor: default;
+
+  background-color: #cccccc; /* Old browsers */
+  background-image: -moz-linear-gradient(top,  #cccccc 0%, #999999 100%); /* FF3.6+ */
+  background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#cccccc), color-stop(100%,#999999)); /* Chrome,Safari4+ */
+  background-image: -webkit-linear-gradient(top,  #cccccc 0%,#999999 100%); /* Chrome10+,Safari5.1+ */
+  background-image: -o-linear-gradient(top,  #cccccc 0%,#999999 100%); /* Opera 11.10+ */
+  background-image: -ms-linear-gradient(top,  #cccccc 0%,#999999 100%); /* IE10+ */
+  background-image: linear-gradient(to bottom,  #cccccc 0%,#999999 100%); /* W3C */
+  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#cccccc', endColorstr='#999999',GradientType=0 ); /* IE6-9 */
+
+  -moz-box-shadow: 0 1px 4px rgba(32, 32, 32, 0.8), 0 10px 25px -5px rgba(255, 255, 255, 0.5) inset;
+  -webkit-box-shadow: 0 1px 4px rgba(32, 32, 32, 0.8), 0 10px 25px -5px rgba(255, 255, 255, 0.5) inset;
+  box-shadow: 0 1px 4px rgba(32, 32, 32, 0.8), 0 10px 25px -5px rgba(255, 255, 255, 0.5) inset;
+  -ms-filter: "progid:DXImageTransform.Microsoft.Shadow(Strength=4, Direction=135, Color='#000000')";
+  filter: progid:DXImageTransform.Microsoft.Shadow(Strength=4, Direction=135, Color='#000000');
+}
+
+/* === Gradients === */
+
+.gr-phone {
+    background: #dbdee0; /* Old browsers */
+    background: -moz-linear-gradient(top,  #dbdee0 0%, #b7b7b7 97%, #c0813f 98%, #e9b878 98%, #cc603a 100%); /* FF3.6+ */
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#dbdee0), color-stop(97%,#b7b7b7), color-stop(98%,#c0813f), color-stop(98%,#e9b878), color-stop(100%,#cc603a)); /* Chrome,Safari4+ */
+    background: -webkit-linear-gradient(top,  #dbdee0 0%,#b7b7b7 97%,#c0813f 98%,#e9b878 98%,#cc603a 100%); /* Chrome10+,Safari5.1+ */
+    background: -o-linear-gradient(top,  #dbdee0 0%,#b7b7b7 97%,#c0813f 98%,#e9b878 98%,#cc603a 100%); /* Opera 11.10+ */
+    background: -ms-linear-gradient(top,  #dbdee0 0%,#b7b7b7 97%,#c0813f 98%,#e9b878 98%,#cc603a 100%); /* IE10+ */
+    background: linear-gradient(to bottom,  #dbdee0 0%,#b7b7b7 97%,#c0813f 98%,#e9b878 98%,#cc603a 100%); /* W3C */
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#dbdee0', endColorstr='#cc603a',GradientType=0 ); /* IE6-9 */
+}
+
+.gr-visa {
+    background: #1db1cf; /* Old browsers */
+    background: -moz-linear-gradient(top,  #1db1cf 0%, #1078ab 100%); /* FF3.6+ */
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#1db1cf), color-stop(100%,#1078ab)); /* Chrome,Safari4+ */
+    background: -webkit-linear-gradient(top,  #1db1cf 0%,#1078ab 100%); /* Chrome10+,Safari5.1+ */
+    background: -o-linear-gradient(top,  #1db1cf 0%,#1078ab 100%); /* Opera 11.10+ */
+    background: -ms-linear-gradient(top,  #1db1cf 0%,#1078ab 100%); /* IE10+ */
+    background: linear-gradient(to bottom,  #1db1cf 0%,#1078ab 100%); /* W3C */
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#1db1cf', endColorstr='#1078ab',GradientType=0 ); /* IE6-9 */
+}
+
+.gr-input {
+    background: #d3d3d3; /* Old browsers */
+    background: -moz-linear-gradient(top,  #d3d3d3 0%, #d9d9d9 38%, #e5e5e5 82%, #e7e7e7 100%); /* FF3.6+ */
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#d3d3d3), color-stop(38%,#d9d9d9), color-stop(82%,#e5e5e5), color-stop(100%,#e7e7e7)); /* Chrome,Safari4+ */
+    background: -webkit-linear-gradient(top,  #d3d3d3 0%,#d9d9d9 38%,#e5e5e5 82%,#e7e7e7 100%); /* Chrome10+,Safari5.1+ */
+    background: -o-linear-gradient(top,  #d3d3d3 0%,#d9d9d9 38%,#e5e5e5 82%,#e7e7e7 100%); /* Opera 11.10+ */
+    background: -ms-linear-gradient(top,  #d3d3d3 0%,#d9d9d9 38%,#e5e5e5 82%,#e7e7e7 100%); /* IE10+ */
+    background: linear-gradient(to bottom,  #d3d3d3 0%,#d9d9d9 38%,#e5e5e5 82%,#e7e7e7 100%); /* W3C */
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#d3d3d3', endColorstr='#e7e7e7',GradientType=0 ); /* IE6-9 */
+}
+
+/* === Dialogs === */
+
+#confirm-dialog { display: none; }
+#payment-form { display: none; }
+#call-dialog { display: none; }
+
+</style>
+</head>
+<body>
+
+<div class="errors"></div>
+  
+<div id="phone-dialog" class="dialog gr-visa">
+  <h2>What Phone Number Do You Want Called?</h2>
+  
+  <ul class="inputs">
+    <li>
+      <label>&nbsp;</label>
+      <input type="text" value="555-555-5555" class="phone-number gr-input full" required="" maxlength="25">
+    </li>
+  </ul>
+  <button class="submit-button" disabled="disabled">Next</button>
+</div>
+
+<div id="confirm-dialog" class="dialog gr-visa">
+  <h2>Your Phone Number</h2>
+  
+  <h3 id="confirm-phone-number">555-555-5555</h3>
+  <h4>Calling this number will cost <strong>$1.00</strong></h4>
+  <button class="back-button">Go Back</button>
+  <button class="submit-button">Confirm</button>
+</div>
+
+<div id="payment-form" class="credit-card gr-visa">
+  <h2>Payment Details</h2>
+
+  <ul class="inputs">
+    <li>
+      <label>Card Number</label>
+      <input type="text" pattern="[0-9 ]{13,19}" value="" class="card-number full gr-input" required="" maxlength="19">
+    </li>
+    <li class="expire last">
+      <label>Expiration</label>
+      <input type="text" pattern="[0-9]{1,2}" value="MM" size="10" class="card-expiry-month month gr-input" required="" maxlength="2">
+      <input type="text" pattern="20[0-9]{2}" value="YYYY" size="10" class="card-expiry-year year gr-input" required="" maxlength="4">
+      <div class="clearfix"></div>
+    </li>
+    <li class="cvc-code last">
+      <label>CVC</label>
+      <input type="text" pattern="[0-9]{3,4}" value="" size="10" class="card-cvc gr-input" required="" maxlength="4">
+    </li>
+    <div class="clearfix"></div>
+  </ul>
+  <button class="submit-button">Pay</button>
+  <div class="watermark"></div>
+</div>
+
+<div id="call-dialog" class="dialog gr-visa">
+  <h2>Phone Call Status</h2>
+  
+  <h3>Calling...</h3>
+  <button class="submit-button">Hang Up</button>
+</div>
+
+<!-- ********************************************************************** -->
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+<script src="https://js.stripe.com/v1/"></script>
+<script src="//static.twilio.com/libs/twiliojs/1.1/twilio.min.js"></script>
+<script>
+Stripe.setPublishableKey('pk_test_EsKUJYcBmVJ0AEtC1Dp5QHNX');
+
+$(document).ready(function() {
+
+  // Phone number input
+  var phoneNumberEdited = false;
+  $('input.phone-number').focus(function() {
+    if ($(this).val() === '555-555-5555')
+      $(this).val('');
+  });
+  $('input.phone-number').keyup(function() {
+    var val = $(this).val();
+    if (val !== '' && val !== '555-555-5555') {
+      phoneNumberEdited = true;
+      $('#phone-dialog .submit-button').removeAttr('disabled');
+    }
+  });
+  $('input.phone-number').blur(function() {
+    if (!phoneNumberEdited)
+      $(this).val('555-555-5555');
+  });
+
+  // Phone number Next button
+  $('#phone-dialog .submit-button').click(function() {
+    $('#confirm-phone-number').text($('input.phone-number').val());
+
+    $('.errors').hide();
+    $('#confirm-dialog').show();
+    $('#phone-dialog').hide();
+  });
+
+  // Confirmation dialog Go Back/Confirm buttons
+  $('#confirm-dialog .back-button').click(function() {
+    $('.errors').hide();
+    $('#phone-dialog').show();
+    $('#confirm-dialog').hide();
+  });
+  $('#confirm-dialog .submit-button').click(function() {
+    $('.errors').hide();
+    $('#payment-form').show();
+    $('#confirm-dialog').hide();
+  });
+
+  // Credit card Pay button
+  $("#payment-form .submit-button").click(function() {
+    $('.errors').hide();
+
+    // Disable the submit button to prevent repeated clicks
+    $('#payment-form .submit-button').attr("disabled", "disabled");
+
+    Stripe.createToken({
+        number: $('.card-number').val(),
+        cvc: $('.card-cvc').val(),
+        exp_month: $('.card-expiry-month').val(),
+        exp_year: $('.card-expiry-year').val()
+    }, stripeResponseHandler);
+
+    // Prevent the form from submitting with the default action
+    return false;
+  });
+});
+
+function stripeResponseHandler(status, response) {
+  if (response.error) {
+    // show the errors on the form
+    $('.errors').text(response.error.message).show();
+    $('#payment-form .submit-button').removeAttr('disabled');
+  } else {
+    $.ajax({
+      type: 'POST',
+      url: '/',
+      data: response.id,
+      success: function(data) {
+        if (data.error) {
+          $('.errors').text(response.error.message).show();
+          $('#payment-form .submit-button').removeAttr('disabled');
+        } else {
+          $('call-dialog').show();
+          $('#payment-form').hide();
+          $('#payment-form .submit-button').removeAttr('disabled');
+          makeCall(data.call_token);
+        }
+      }
+    });
+  }
+}
+
+function makeCall(token) {
+  alert('Calling with token ' + token);
+}
+
+</script>
+</body>
+</html>
